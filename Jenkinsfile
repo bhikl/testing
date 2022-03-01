@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    tools {nodejs "nodenv"}
+    tools {nodejs "nodenv", terraform "Terraform"}
     stages {
         stage('Code Quality Check via SonarQube') {
             steps {
@@ -23,9 +23,9 @@ pipeline {
                 }
             }
         }
-        stage('terraform') {
+        stage('Terraform Init') {
             steps {
-                sh './terraform/terraform.sh apply -auto-approve -no-color'
+                sh label: '', script: 'terraform init'
             }
         }
     }
