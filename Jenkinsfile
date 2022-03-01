@@ -11,9 +11,7 @@ pipeline {
                     -Dsonar.projectKey=test-node-js \
                     -Dsonar.sources=. \
                     -Dsonar.css.node=. \
-                    -Dsonar.host.url=http://172.20.0.3:9000 \
-                    -Dsonar.login=admin \
-                    -Dsonar.password=your-generated-token-from-sonarqube-container"
+                    -Dsonar.host.url=http://172.20.0.3:9000"
                     }
                 }
             }
