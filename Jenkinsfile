@@ -1,6 +1,9 @@
 pipeline {
     agent any
-    tools {nodejs "nodenv", terraform "Terraform"}
+    tools {
+        nodejs "nodenv"
+        terraform "Terraform"
+    }
     stages {
         stage('Code Quality Check via SonarQube') {
             steps {
