@@ -33,8 +33,13 @@ pipeline {
         }
         stage('Terraform Apply') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_cred']]) {
-                    sh label: '', script: 'terraform -chdir=./terraform/ apply -auto-approve '
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: "credentials-id-here",
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                        sh label: '', script: 'terraform -chdir=./terraform/ apply -auto-approve '
                 }
             }
         }
