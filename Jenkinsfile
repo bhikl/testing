@@ -33,7 +33,9 @@ pipeline {
         }
         stage('Terraform Apply') {
             steps {
-                sh label: '', script: 'terraform -chdir=./terraform/ apply -auto-approve '
+                withCredentials([<object of type com.cloudbees.jenkins.plugins.awscredentials.AmazonWebServicesCredentialsBinding>]) {
+                    sh label: '', script: 'terraform -chdir=./terraform/ apply -auto-approve '
+                }
             }
         }
     }
