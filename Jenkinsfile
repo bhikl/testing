@@ -39,7 +39,7 @@ pipeline {
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
-                        sh label: '', script: 'terraform -chdir=./terraform/ apply -auto-approve '
+                        sh label: '', script: 'terraform -chdir=./terraform/ destroy -auto-approve '
                 }
             }
         }
