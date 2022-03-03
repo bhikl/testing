@@ -31,5 +31,10 @@ pipeline {
                 sh label: '', script: 'terraform -chdir=./terraform/ init'
             }
         }
+        stage('Terraform Apply') {
+            steps {
+                sh label: '', script: 'terraform -chdir=./terraform/ apply -auto-approve '
+            }
+        }
     }
 }
