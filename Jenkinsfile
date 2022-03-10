@@ -2,7 +2,6 @@ pipeline {
     agent any
     tools {
         nodejs "nodenv"
-        terraform "Terraform"
     }
     stages {
         stage('Code Quality Check via SonarQube') {
@@ -13,8 +12,7 @@ pipeline {
                     sh "${tool("sonarqube")}/bin/sonar-scanner \
                     -Dsonar.projectKey=test-node-js \
                     -Dsonar.sources=. \
-                    -Dsonar.css.node=. \
-                    -Dsonar.host.url=http://172.20.0.3:9000"
+                    -Dsonar.css.node=."
                     }
                 }
             }
@@ -23,23 +21,6 @@ pipeline {
             steps {
                 nodejs(nodeJSInstallationName: 'nodenv'){
                 sh "npm install"
-                }
-            }
-        }
-        stage('Terraform Init') {
-            steps {
-                sh label: '', script: 'terraform -chdir=./terraform/ init'
-            }
-        }
-        stage('Terraform Apply') {
-            steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: "aws_cred",
-                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                ]]) {
-                        sh label: '', script: 'terraform -chdir=./terraform/ destroy -auto-approve '
                 }
             }
         }
