@@ -1,9 +1,8 @@
 import express from "express";
 import { Db } from "../Db/Db.js";
 
-let db = new Db;
-db.init_Db();
-db.fetch_data();
+let db;
+
 export default function () {
     const router = express.Router();
 
@@ -19,6 +18,15 @@ export default function () {
         try {
             let respFromDb = await db.fetch_rows();
             res.json(respFromDb);
+        } catch (err) {
+            console.log(err);
+        }
+    });
+    router.get("/init", async () => {
+        try {
+            db = new Db;
+            await db.init_Db();
+            await db.fetch_data();
         } catch (err) {
             console.log(err);
         }

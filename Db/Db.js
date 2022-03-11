@@ -7,12 +7,14 @@ class Db {
     async init_Db() {
         try{
             connection = await mysql.createConnection({
-                host     : "localhost",
-                user     : "user",
-                password : "cnytv0z",
+                host     : "database-1.cmwm0qspinf0.us-east-2.rds.amazonaws.com",
+                user     : "admin",
+                password : "zino58lj0kdh",
                 database : "beatles"
             });
             await connection.connect();
+            await connection.query("CREATE DATABASE IF NOT EXISTS beatles;");
+            await connection.query("USE beatles;");
             await connection.query("CREATE TABLE IF NOT EXISTS items"+
                         "(id INT PRIMARY KEY AUTO_INCREMENT,kind VARCHAR(30),"+
                         "collectionName VARCHAR(255),"+
@@ -42,7 +44,7 @@ class Db {
                 }
                 for (const song of songs.results) {
                     if(song.trackName != null){
-                        var sql = "INSERT INTO items"+
+                        var sql = "INSERT INTO items "+
                             "(kind, collectionName,"+
                             "trackName, collectionPrice,"+
                             "trackPrice, primaryGenreName,"+
