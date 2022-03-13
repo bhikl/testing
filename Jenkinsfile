@@ -21,7 +21,9 @@ pipeline {
         /* This builds the actual image; synonymous to
          * docker build on the command line */
             steps {
-                app = docker.build("azionz/itunes-api-fetch")
+                script {
+                    app = docker.build("azionz/itunes-api-fetch")
+                }
             }
         }
 
@@ -29,8 +31,10 @@ pipeline {
             /* Ideally, we would run a test framework against our image.
             * For this example, we're using a Volkswagen-type approach ;-) */
             steps {
-                app.inside {
-                    sh 'echo "Tests passed"'
+                script {
+                    app.inside {
+                        sh 'echo "Tests passed"'
+                    }
                 }
             }
         }
@@ -41,9 +45,11 @@ pipeline {
             * Second, the 'latest' tag.
             * Pushing multiple tags is cheap, as all the layers are reused. */
             steps {
-                docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                    app.push("${env.BUILD_NUMBER}")
-                    app.push("latest")
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")
+                    }
                 }
             }
         }
