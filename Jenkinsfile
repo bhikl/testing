@@ -7,11 +7,6 @@ pipeline {
   agent any
   tools {nodejs "nodenv" }
   stages {
-    stage('Cloning Git') {
-      steps {
-        git 'https://github.com/bhikl/testing'
-      }
-    }
     stage('Build') {
        steps {
          sh 'npm install'
