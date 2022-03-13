@@ -2,7 +2,6 @@ pipeline {
     agent any
     tools {
         nodejs "nodenv"
-        docker "dockerenv"
     }
     stages {
         stage('Code Quality Check via SonarQube') {
