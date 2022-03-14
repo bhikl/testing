@@ -1,12 +1,11 @@
 pipeline {
-    agent {
-        label 'docker'
-    }
+    agent none
     tools {
         nodejs "nodenv"
     }
     stages {
         stage('Code Quality Check via SonarQube') {
+            agent any
             steps {
                 script {
                     def scannerHome = tool 'sonarqube';
@@ -19,38 +18,29 @@ pipeline {
                 }
             }
         }
-        stage('Build image') {
-        /* This builds the actual image; synonymous to
-         * docker build on the command line */
-            steps {
-                script {
-                    app = docker.build("azionz/itunes-api-fetch")
+        stage("Docker"){
+            agent {
+                docker {
+                    image 'openjdk:11.0.5-slim'
+                    args '-v $HOME/.m2:/root/.m2'
                 }
             }
-        }
-
-        stage('Test image') {
-            /* Ideally, we would run a test framework against our image.
-            * For this example, we're using a Volkswagen-type approach ;-) */
-            steps {
-                script {
-                    app.inside {
-                        sh 'echo "Tests passed"'
+            stages {
+                stage('Build image') {
+                    steps {
+                        script {
+                            app = docker.build("azionz/itunes-api-fetch")
+                        }
                     }
                 }
-            }
-        }
-
-        stage('Push image') {
-            /* Finally, we'll push the image with two tags:
-             * First, the incremental build number from Jenkins
-            * Second, the 'latest' tag.
-            * Pushing multiple tags is cheap, as all the layers are reused. */
-            steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                        app.push("${env.BUILD_NUMBER}")
-                        app.push("latest")
+                stage('Push image') {
+                    steps {
+                        script {
+                            docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+                                app.push("${env.BUILD_NUMBER}")
+                                app.push("latest")
+                            }
+                        }
                     }
                 }
             }
