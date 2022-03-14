@@ -51,6 +51,18 @@ spec:
                 }
             }
         }
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/joostvdg/cat.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                container('nodejs') {
+                    sh 'npm i'
+                }
+            }
+        }
         stage('Make Image') {
             environment {
                 PATH        = "/busybox:$PATH"
