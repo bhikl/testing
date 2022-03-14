@@ -7,8 +7,8 @@ metadata:
   name: kaniko
 spec:
   containers:
-  - name: golang
-    image: golang:1.12
+  - name: nodejs
+    image: node:17.6-alpine3.14
     command:
     - cat
     tty: true
