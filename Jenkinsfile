@@ -38,16 +38,6 @@ spec:
         nodejs "nodenv"
     }
     stages {
-        stage('Prepare') {
-            steps {
-                sh 'apt-get install git-core'
-            }
-        }
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/bhikl/testing'
-            }
-        }
         stage('Build') {
             steps {
                 container('nodejs') {
