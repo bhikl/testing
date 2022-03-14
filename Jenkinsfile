@@ -38,19 +38,6 @@ spec:
         nodejs "nodenv"
     }
     stages {
-        stage('Code Quality Check via SonarQube') {
-            steps {
-                script {
-                    def scannerHome = tool 'sonarqube';
-                    withSonarQubeEnv("sonarqube-container") {
-                    sh "${tool("sonarqube")}/bin/sonar-scanner \
-                    -Dsonar.projectKey=test-node-js \
-                    -Dsonar.sources=. \
-                    -Dsonar.css.node=."
-                    }
-                }
-            }
-        }
         stage('Checkout') {
             steps {
                 git 'https://github.com/bhikl/testing'
