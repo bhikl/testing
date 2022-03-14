@@ -8,8 +8,8 @@ metadata:
   name: kaniko
 spec:
   containers:
-  - name: nodejs
-    image: node:17.6-alpine3.14
+  - name: golang
+    image: golang:1.12
     command:
     - cat
     tty: true
@@ -34,32 +34,16 @@ spec:
 """
         }
     }
-    tools {
-        nodejs "nodenv"
-    }
     stages {
-        stage('Code Quality Check via SonarQube') {
-            steps {
-                script {
-                    def scannerHome = tool 'sonarqube';
-                    withSonarQubeEnv("sonarqube-container") {
-                    sh "${tool("sonarqube")}/bin/sonar-scanner \
-                    -Dsonar.projectKey=test-node-js \
-                    -Dsonar.sources=. \
-                    -Dsonar.css.node=."
-                    }
-                }
-            }
-        }
         stage('Checkout') {
             steps {
-                git 'https://github.com/bhikl/testing'
+                git 'https://github.com/joostvdg/cat.git'
             }
         }
         stage('Build') {
             steps {
-                container('nodejs') {
-                    sh 'npm i'
+                container('golang') {
+                    sh './build-go-bin.sh'
                 }
             }
         }
@@ -67,8 +51,8 @@ spec:
             environment {
                 PATH        = "/busybox:$PATH"
                 REGISTRY    = 'index.docker.io' // Configure your own registry
-                REPOSITORY  = 'azionz'
-                IMAGE       = 'itunes-api-fetch'
+                REPOSITORY  = 'caladreas'
+                IMAGE       = 'cat'
             }
             steps {
                 container(name: 'kaniko', shell: '/busybox/sh') {
