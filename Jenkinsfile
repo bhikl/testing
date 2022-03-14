@@ -53,7 +53,7 @@ spec:
         }
         stage('Checkout') {
             steps {
-                git 'https://github.com/joostvdg/cat.git'
+                git 'https://github.com/bhikl/testing'
             }
         }
         stage('Build') {
