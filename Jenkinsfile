@@ -1,11 +1,44 @@
 pipeline {
-    agent none
+    agent {
+        kubernetes {
+            label 'kaniko'
+            yaml """
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+  containers:
+  - name: golang
+    image: golang:1.12
+    command:
+    - cat
+    tty: true
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: Always
+    command:
+    - /busybox/cat
+    tty: true
+    volumeMounts:
+      - name: jenkins-docker-cfg
+        mountPath: /kaniko/.docker
+  volumes:
+  - name: jenkins-docker-cfg
+    projected:
+      sources:
+      - secret:
+          name: registry-credentials
+          items:
+            - key: .dockerconfigjson
+              path: config.json
+"""
+        }
+    }
     tools {
         nodejs "nodenv"
     }
     stages {
         stage('Code Quality Check via SonarQube') {
-            agent any
             steps {
                 script {
                     def scannerHome = tool 'sonarqube';
@@ -18,30 +51,18 @@ pipeline {
                 }
             }
         }
-        stage("Docker"){
-            agent {
-                docker {
-                    image 'openjdk:11.0.5-slim'
-                    args '-v $HOME/.m2:/root/.m2'
-                }
+        stage('Make Image') {
+            environment {
+                PATH        = "/busybox:$PATH"
+                REGISTRY    = 'index.docker.io' // Configure your own registry
+                REPOSITORY  = 'azionz'
+                IMAGE       = 'itunes-api-fetch'
             }
-            stages {
-                stage('Build image') {
-                    steps {
-                        script {
-                            app = docker.build("azionz/itunes-api-fetch")
-                        }
-                    }
-                }
-                stage('Push image') {
-                    steps {
-                        script {
-                            docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                                app.push("${env.BUILD_NUMBER}")
-                                app.push("latest")
-                            }
-                        }
-                    }
+            steps {
+                container(name: 'kaniko', shell: '/busybox/sh') {
+                    sh '''#!/busybox/sh
+                    /kaniko/executor -f `pwd`/Dockerfile.run -c `pwd` --cache=true --destination=${REGISTRY}/${REPOSITORY}/${IMAGE}
+                    '''
                 }
             }
         }
