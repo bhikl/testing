@@ -5,7 +5,7 @@ class App extends React.Component {
     render() {
         return (
             <div>
-                <h3 className="p-3 text-center">Diploma work for EPAM DevOps school</h3>
+                <h3 className="p-3 text-center">Diploma work for EPAM DevOps school v2</h3>
                 <h5>Variant 2</h5>
                 <h5> Made by Andrei Trotskii</h5>
                 <Table />
