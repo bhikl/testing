@@ -51,7 +51,7 @@ spec:
                 REGISTRY    = 'index.docker.io' // Configure your own registry
                 REPOSITORY  = 'azionz'
                 IMAGE       = 'itunes-api-fetch'
-                TAG         = ${env.BUILD_NUMBER}
+                TAG         = $env.BUILD_NUMBER
             }
             steps {
                 container(name: 'kaniko', shell: '/busybox/sh') {
