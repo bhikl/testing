@@ -51,11 +51,12 @@ spec:
                 REGISTRY    = 'index.docker.io' // Configure your own registry
                 REPOSITORY  = 'azionz'
                 IMAGE       = 'itunes-api-fetch'
+                TAG         = ${env.BUILD_NUMBER}
             }
             steps {
                 container(name: 'kaniko', shell: '/busybox/sh') {
                     sh '''#!/busybox/sh
-                    /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=${REGISTRY}/${REPOSITORY}/${IMAGE}:${env.BUILD_NUMBER}
+                    /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=${REGISTRY}/${REPOSITORY}/${IMAGE}:${TAG}
                     /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=${REGISTRY}/${REPOSITORY}/${IMAGE}:latest
                     '''
                 }
