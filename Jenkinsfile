@@ -1,5 +1,25 @@
 pipeline {
-    agent {
+    agent none
+    tools {
+        nodejs "nodenv"
+    }
+    stages {
+      stage('Code Quality Check via SonarQube') {
+        agent any
+        steps {
+          script {
+            def scannerHome = tool 'sonarqube';
+            withSonarQubeEnv("sonarqube-container") {
+              sh "${tool("sonarqube")}/bin/sonar-scanner \
+                -Dsonar.projectKey=test-node-js \
+                -Dsonar.sources=. \
+                -Dsonar.css.node=."
+            }
+          }
+        }
+      }
+      stage('Build') {
+        agent {
         kubernetes {
             label 'kaniko'
             yaml """
@@ -34,26 +54,6 @@ spec:
 """
         }
     }
-    tools {
-        nodejs "nodenv"
-    }
-    stages {
-      stage('Code Quality Check via SonarQube') {
-        agent any
-        steps {
-          script {
-            def scannerHome = tool 'sonarqube';
-            withSonarQubeEnv("sonarqube-container") {
-              sh "${tool("sonarqube")}/bin/sonar-scanner \
-                -Dsonar.projectKey=test-node-js \
-                -Dsonar.sources=. \
-                -Dsonar.css.node=."
-            }
-          }
-        }
-      }
-      stage('Build') {
-        agent {label "kaniko"}
           steps {
               container('nodejs') {
                   sh 'npm i'
@@ -61,7 +61,41 @@ spec:
           }
       }
       stage('Make Image') {
-        agent {label "kaniko"}
+        agent {
+        kubernetes {
+            label 'kaniko'
+            yaml """
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+  containers:
+  - name: nodejs
+    image: node:17.6-alpine3.14
+    command:
+    - cat
+    tty: true
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: Always
+    command:
+    - /busybox/cat
+    tty: true
+    volumeMounts:
+      - name: jenkins-docker-cfg
+        mountPath: /kaniko/.docker
+  volumes:
+  - name: jenkins-docker-cfg
+    projected:
+      sources:
+      - secret:
+          name: registry-credentials
+          items:
+            - key: .dockerconfigjson
+              path: config.json
+"""
+        }
+    }
           environment {
               PATH        = "/busybox:$PATH"
               REGISTRY    = 'index.docker.io' // Configure your own registry
