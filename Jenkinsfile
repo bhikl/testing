@@ -79,6 +79,7 @@ spec:
               }
             }
           }
+      }
       stage('Update Image') {
         agent any
         steps{
@@ -88,5 +89,4 @@ spec:
         }
       }
     }
-  }
 }
