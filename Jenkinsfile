@@ -51,12 +51,11 @@ spec:
                 REGISTRY    = 'index.docker.io' // Configure your own registry
                 REPOSITORY  = 'azionz'
                 IMAGE       = 'itunes-api-fetch'
-                TAG         = "$BUILD_NUMBER"
             }
             steps {
                 container(name: 'kaniko', shell: '/busybox/sh') {
                     sh '''#!/busybox/sh
-                    /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=${REGISTRY}/${REPOSITORY}/${IMAGE}:prod_${GIT_SHORT_COMMIT}
+                    /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=${REGISTRY}/${REPOSITORY}/${IMAGE}:prod_${GIT_COMMIT}
                     /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=${REGISTRY}/${REPOSITORY}/${IMAGE}:latest
                     '''
                 }
@@ -66,7 +65,7 @@ spec:
           agent any
             steps{
                 script{
-                    sh "kubectl set image deployment/itunes-api-fetch itunes-api-fetch-cont=azionz/itunes-api-fetch:prod_${GIT_SHORT_COMMIT} -n default"
+                    sh "kubectl set image deployment/itunes-api-fetch itunes-api-fetch-cont=azionz/itunes-api-fetch:prod_${GIT_COMMIT} -n default"
                 }
             }
         }
