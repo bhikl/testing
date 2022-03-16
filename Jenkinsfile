@@ -38,36 +38,50 @@ spec:
         nodejs "nodenv"
     }
     stages {
-        stage('Build') {
-            steps {
-                container('nodejs') {
-                    sh 'npm i'
-                }
+      stage('Code Quality Check via SonarQube') {
+        agent any
+        steps {
+          script {
+            def scannerHome = tool 'sonarqube';
+            withSonarQubeEnv("sonarqube-container") {
+              sh "${tool("sonarqube")}/bin/sonar-scanner \
+                -Dsonar.projectKey=test-node-js \
+                -Dsonar.sources=. \
+                -Dsonar.css.node=."
             }
+          }
         }
-        stage('Make Image') {
-            environment {
-                PATH        = "/busybox:$PATH"
-                REGISTRY    = 'index.docker.io' // Configure your own registry
-                REPOSITORY  = 'azionz'
-                IMAGE       = 'itunes-api-fetch'
+      }
+      stage('Build') {
+          steps {
+              container('nodejs') {
+                  sh 'npm i'
+              }
+          }
+      }
+      stage('Make Image') {
+          environment {
+              PATH        = "/busybox:$PATH"
+              REGISTRY    = 'index.docker.io' // Configure your own registry
+              REPOSITORY  = 'azionz'
+              IMAGE       = 'itunes-api-fetch'
+          }
+          steps {
+            container(name: 'kaniko', shell: '/busybox/sh') {
+              sh '''#!/busybox/sh
+                  /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=${REGISTRY}/${REPOSITORY}/${IMAGE}:prod_${GIT_COMMIT} \
+                  --destination=${REGISTRY}/${REPOSITORY}/${IMAGE}:latest
+                  '''
             }
-            steps {
-                container(name: 'kaniko', shell: '/busybox/sh') {
-                    sh '''#!/busybox/sh
-                    /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=${REGISTRY}/${REPOSITORY}/${IMAGE}:prod_${GIT_COMMIT} \
-                   --destination=${REGISTRY}/${REPOSITORY}/${IMAGE}:latest
-                    '''
-                }
-            }
+          }
+      }
+      stage('Update Image') {
+        agent any
+        steps{
+          script{
+            sh "kubectl set image deployment/itunes-api-fetch itunes-api-fetch-cont=azionz/itunes-api-fetch:prod_${GIT_COMMIT} -n default"
+          }
         }
-        stage('Update Image') {
-          agent any
-            steps{
-                script{
-                    sh "kubectl set image deployment/itunes-api-fetch itunes-api-fetch-cont=azionz/itunes-api-fetch:prod_${GIT_COMMIT} -n default"
-                }
-            }
-        }
+      }
     }
 }
