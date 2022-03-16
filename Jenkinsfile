@@ -53,6 +53,7 @@ spec:
         }
       }
       stage('Build') {
+        agent "kaniko"
           steps {
               container('nodejs') {
                   sh 'npm i'
@@ -60,6 +61,7 @@ spec:
           }
       }
       stage('Make Image') {
+        agent "kaniko"
           environment {
               PATH        = "/busybox:$PATH"
               REGISTRY    = 'index.docker.io' // Configure your own registry
