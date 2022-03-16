@@ -62,5 +62,12 @@ spec:
                 }
             }
         }
+        stage('Update Image') {
+            steps{
+                script{
+                    sh "kubectl set image deployment/itunes-api-fetch itunes-api-fetch-cont=azionz/itunes-api-fetch:prod_${GIT_COMMIT} -n default"
+                }
+            }
+        }
     }
 }
