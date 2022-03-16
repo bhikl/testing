@@ -18,7 +18,7 @@ pipeline {
           }
         }
       }
-      stage('Build') {
+      stage('Builsdd') {
         agent {
         kubernetes {
             label 'kaniko'
@@ -54,7 +54,7 @@ spec:
 """
               }
           }
-          steps {
+          stages {
             stage('Build') {
               steps {
                 container('nodejs') {
