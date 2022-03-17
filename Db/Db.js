@@ -7,10 +7,9 @@ class Db {
     async init_Db() {
         try{
             connection = await mysql.createConnection({
-                host     : "database-1.cmwm0qspinf0.us-east-2.rds.amazonaws.com",
-                user     : "admin",
-                password : "zino58lj0kdh",
-                database : "beatles"
+                host     : process.env.ADR,
+                user     : process.env.USR,
+                password : process.env.PSWD
             });
             await connection.connect();
             await connection.query("CREATE DATABASE IF NOT EXISTS beatles;");
