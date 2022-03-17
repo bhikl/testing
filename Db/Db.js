@@ -9,7 +9,8 @@ class Db {
             connection = await mysql.createConnection({
                 host     : process.env.ADR,
                 user     : process.env.USR,
-                password : process.env.PSWD
+                password : process.env.PSWD,
+                port     : 31409
             });
             await connection.connect();
             await connection.query("CREATE DATABASE IF NOT EXISTS beatles;");
