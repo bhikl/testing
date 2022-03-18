@@ -71,6 +71,7 @@ class Db {
     }
     async fetch_rows()  {
         try{
+            console.log('FETCHING');
             const [rows,] = await connection.query("SELECT  * FROM items ORDER BY releaseDate ASC;");
             return rows;
         } catch(err) {

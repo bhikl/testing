@@ -17,6 +17,7 @@ export default function () {
     router.get("/get", async (_, res) => {
         try {
             let respFromDb = await db.fetch_rows();
+            console.log(respFromDb[0]);
             res.json(respFromDb);
         } catch (err) {
             console.log(err);
